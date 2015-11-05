@@ -265,10 +265,15 @@ func getPublicIPv6(addresses []net.Addr) (net.IP, error) {
 		if ip.To4() != nil {
 			continue
 		}
-		// do not bind link-local (fe80::/10) / ULA (fc00::/7) / loopback (::1)
-		if ip[0]|0xf == 0xff || ip[0]|0 == 0 {
+
+		if ip.IsLoopback() {
 			continue
 		}
+
+		if ip.IsLinkLocalUnicast() {
+			continue
+		}
+
 		candidates = append(candidates, ip)
 	}
 	numIps := len(candidates)
